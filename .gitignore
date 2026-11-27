@@ -1,0 +1,23 @@
+# 설치된 라이브러리
+node_modules/
+
+# Next.js 빌드 결과물
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# 테스트 결과물
+test-results/
+playwright-report/
+
+# 비밀 값 (절대 올리지 않음). 예시는 .env.example 참고
+.env
+.env*.local
+
+# 운영체제·편집기가 만드는 파일
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

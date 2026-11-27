@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Phone bridge (clipboard sharing with the paired computer): a foreground service holds the connection, with a
+         visible notification (POST_NOTIFICATIONS is asked when the switch is turned on); the receiver restarts it after a reboot. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- one lookup of the number of a call that rings, to show the contact's name on the Mac (asked only when notifications are on) -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Wake button only: names the Wi-Fi network so that the Wake-on-LAN packet cannot leave through mobile data -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Dictation widget only: asked for the first time its microphone button is tapped -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Android 11+: the speech recognizer has to be visible to the app (Dictation widget) -->
+    <queries>
+        <!-- the apps that can be switched on for the Mac (launchable apps only; no all-packages permission) -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="PhoneBox"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:localeConfig="@xml/locales_config"
+        android:theme="@style/Theme.DeskPanel">
+
+        <!-- The USB key (UsbKey.kt) for the computer's "adb shell content query". DUMP is held by the adb shell and can't
+             be granted to an installed app, so no other app on the phone can read it. -->
+        <provider
+            android:name=".UsbKeyProvider"
+            android:authorities="net.oxog.phonebox.deskpanel.usb"
+            android:exported="true"
+            android:readPermission="android.permission.DUMP"
+            android:writePermission="android.permission.DUMP" />
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Pairing without USB: the QR code on the computer's settings page. Android 12+ opens unverified https
+                 links in the browser; that page then offers phonebox://pair (the second filter). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="ersinkoc.github.io" android:pathPrefix="/phonebox/pair" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="phonebox" android:host="pair" />
+            </intent-filter>
+        </activity>
+
+        <!-- Settings › Display › "Use as the phone's home screen": enabled by the app itself (off by default). As the home
+             app the panel starts after a reboot and the Home button returns to it; no root needed. -->
+        <activity-alias
+            android:name=".HomeAlias"
+            android:enabled="false"
+            android:exported="true"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Phone bridge screen: the switches and status. Opened by the panel and the service's notification. -->
+        <activity
+            android:name=".BridgeActivity"
+            android:exported="false"
+            android:label="@string/bridge_title"
+            android:theme="@android:style/Theme.Material.NoActionBar" />
+
+        <!-- What a long press on the Send to Mac tile opens. Android sends a tile's long press to the one activity of the app
+             that has this filter, for every tile of the app, so the PhoneBox tile's goes here too: BridgeActivity hands that
+             one on to App info, as before. Disabled until Phone bridge is turned on (BridgeEntryPoints), so for everyone
+             else a long press on the PhoneBox tile opens App info straight away, without this app starting at all. -->
+        <activity-alias
+            android:name=".BridgeTilePreferences"
+            android:enabled="false"
+            android:exported="true"
+            android:targetActivity=".BridgeActivity">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- "Send to Mac": the text-selection menu (Android 6+, next to Copy) and the Share sheet. See-through: shows the start of
+             the text and sends it only when the owner taps Send to Mac (any app can start it with any text).
+             Disabled until Phone bridge is turned on (BridgeEntryPoints), so it never clutters other apps' menus for anyone else. -->
+        <activity
+            android:name=".SendToMacActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/bridge_send_to_mac"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!-- Opened by the tile and the service's notification button: reads the clipboard while it has focus, sends, closes. -->
+        <activity
+            android:name=".ReadClipboardActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- Quick Settings tile "Send to Mac" (Edit tiles › Send to Mac), Android 7+; disabled until Phone bridge is turned on. -->
+        <service
+            android:name=".SendClipboardTile"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@drawable/ic_tile"
+            android:label="@string/bridge_send_to_mac"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            tools:targetApi="n">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE" android:value="false" />
+        </service>
+
+        <service
+            android:name=".ClipboardService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Shares the clipboard with the paired computer while the user has Phone bridge turned on" />
+        </service>
+
+        <!-- Phone bridge notifications: sees the phone's notifications to show them on the Mac. Disabled until the notification
+             switch is on (BridgeEntryPoints), so it is not in the system's Notification access list for anyone else. -->
+        <service
+            android:name=".PhoneNotificationListener"
+            android:enabled="false"
+            android:exported="true"
+            android:label="@string/bridge_title"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Disabled until Phone bridge is turned on (BridgeEntryPoints): for everyone else the app does not start at boot. -->
+        <receiver android:name=".BridgeBootReceiver" android:enabled="false" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Quick Settings tile (Edit tiles › PhoneBox): opens the panel. Tiles exist from Android 7.0; below that the
+             service is disabled (values/bools.xml vs values-v24). -->
+        <service
+            android:name=".PanelTile"
+            android:enabled="@bool/quick_settings_tile"
+            android:exported="true"
+            android:icon="@drawable/ic_tile"
+            android:label="PhoneBox"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            tools:targetApi="n">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE" android:value="false" />
+        </service>
+    </application>
+</manifest>
