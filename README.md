@@ -42,7 +42,26 @@ docs/                서비스 개요, 시안 대비 차이, 결정 기록
 .github/             이슈·PR 양식
 CLAUDE.md, AGENTS.md AI 작업 규칙
 CHANGELOG.md         버전별 변경 기록
+.claude/             Claude Code 설정과 디자인 스킬 (아래 "디자인 도구" 참고)
+.agents/skills/      외부에서 받은 스킬 원본 (impeccable, stageshow)
+resources/           참고 자료 (앱 코드와 무관, 빌드·검사 대상 아님)
 ```
+
+## 디자인 도구
+
+Claude Code로 작업할 때 쓰는 도구입니다. 앱 실행에는 필요 없습니다.
+
+| 이름 | 위치 | 용도 |
+|---|---|---|
+| impeccable | `.agents/skills/impeccable` | 화면 디자인 점검과 다듬기 |
+| stageshow | `.agents/skills/stageshow` | 제품 소개용 화면 연출·애니메이션 |
+| web-design-guidelines | `.claude/skills/` | 웹 디자인 가이드라인 점검 |
+| imagegen-frontend-mobile / web, image-to-code, brandkit | `.claude/skills/` | 이미지 생성, 이미지를 코드로 옮기기, 브랜드 자료 |
+| ponytail 플러그인 | `.claude/settings.json` | Claude Code 플러그인과 상태 표시줄 |
+| awesome-design-md | `resources/awesome-design-md` | 여러 서비스의 디자인 규칙 모음 (참고용) |
+| phonebox | `resources/phonebox` | 휴대폰 화면 관련 외부 도구 (참고용) |
+
+외부 스킬의 출처와 버전은 `skills-lock.json`에 기록되어 있습니다.
 
 ### 데이터 계층 교체 방법 (단계 2)
 

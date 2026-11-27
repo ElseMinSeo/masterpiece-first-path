@@ -30,6 +30,11 @@ npm test
 npm run build && npm run test:e2e   # 화면을 바꿨을 때
 ```
 
+## 디자인 도구
+- 화면 디자인을 점검하거나 다듬을 때는 `.claude/skills/`의 스킬(impeccable, web-design-guidelines 등)을 활용합니다.
+- `.agents/`와 `resources/`는 외부에서 받은 자료입니다. 직접 고치지 않고, 앱 코드에서 가져다 쓰지 않습니다.
+  (`tsconfig.json`에서 검사 대상 밖으로 빼 두었습니다.)
+
 ## 문서 위치
 - 서비스 개요: `docs/overview.md`
 - 시안 대비 차이, 미확정 가정값: `docs/design-notes.md`
