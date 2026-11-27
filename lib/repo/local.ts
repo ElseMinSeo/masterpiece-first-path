@@ -1,4 +1,4 @@
-import { parseSubmission, type ApplicationDraft } from "@/lib/apply/schema";
+import { normalizeDraft, parseSubmission, type ApplicationDraft } from "@/lib/apply/schema";
 import { getPlace } from "@/lib/data/places";
 import type { Profile } from "@/lib/types";
 import type { AppRepository, Application, SubmitResult } from "./types";
@@ -76,7 +76,8 @@ export class LocalDemoRepository implements AppRepository {
   }
 
   async getDraft(): Promise<ApplicationDraft | null> {
-    return this.read<ApplicationDraft | null>(K.draft, null);
+    const raw = this.read<(Partial<ApplicationDraft> & { idempotencyKey: string }) | null>(K.draft, null);
+    return raw && typeof raw.idempotencyKey === "string" ? normalizeDraft(raw) : null;
   }
   async saveDraft(draft: ApplicationDraft): Promise<void> {
     this.write(K.draft, { ...draft, updatedAt: this.now().toISOString() });
@@ -100,7 +101,8 @@ export class LocalDemoRepository implements AppRepository {
   }
 
   /** localStorage 연산은 동기라 이 함수 안에서는 다른 제출이 끼어들지 못한다 */
-  private submitNow(draft: ApplicationDraft): SubmitResult {
+  private submitNow(input: ApplicationDraft): SubmitResult {
+    const draft = normalizeDraft(input);
     const apps = this.read<Application[]>(K.applications, []);
     const same = apps.find((a) => a.idempotencyKey === draft.idempotencyKey);
     if (same) return { ok: true, application: same, duplicate: true };

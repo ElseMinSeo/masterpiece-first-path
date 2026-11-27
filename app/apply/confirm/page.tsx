@@ -29,7 +29,7 @@ function Check({ checked, onChange, disabled, children, id }: { checked: boolean
 function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boolean) => void }) {
   const { updateDraft, submit } = useApp();
   const router = useRouter();
-  const { errors: stepErrors, valid, attempt } = useStepValidation(4, draft);
+  const { errors: stepErrors, valid, attempt } = useStepValidation(5, draft);
   const [serverErrors, setServerErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -58,7 +58,7 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
     onBusy(false);
     setServerErrors(res.errors);
     const inv = firstInvalidStep(draft);
-    if (inv !== null && inv < 4) router.push(STEP_PATH[inv]);
+    if (inv !== null && inv < 5) router.push(STEP_PATH[inv]);
   };
 
   const toggleIn = (key: "dates" | "timeSlots", v: string, max: number) => {
@@ -83,7 +83,7 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
               <button key={d} type="button" aria-pressed={sel} disabled={!sel && draft.dates.length >= MAX_DATES}
                 onClick={() => toggleIn("dates", d, MAX_DATES)}
                 className={cx("min-h-11 rounded-xl border text-[13px] disabled:opacity-40",
-                  sel ? "border-brand bg-brand-soft font-semibold text-brand" : "border-line bg-white text-ink/70")}>
+                  sel ? "border-brand bg-brand-soft font-semibold text-brand-ink" : "border-line bg-white text-ink/70")}>
                 {formatDateChip(d)}
               </button>
             );
@@ -120,6 +120,9 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
 
       <Field id="confirmed" as="fieldset" label="상대에게 공개할 소개" hint="확인 필수" error={errors.confirmed}>
         <Card className="space-y-1">
+          <Check id="disclose-nickname" checked disabled onChange={() => undefined}>
+            닉네임 <span className="text-muted">(항상 공개)</span> <strong data-testid="preview-nickname">{draft.nickname.trim() || "—"}</strong>
+          </Check>
           <Check id="disclose-intro" checked disabled onChange={() => undefined}>
             한 줄 소개 <span className="text-muted">(항상 공개)</span>
             <span className="mt-1 block rounded-lg bg-field px-3 py-2 text-[14px]" data-testid="preview-intro">{draft.intro.trim() || "—"}</span>
@@ -130,10 +133,10 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
           </Check>
           <Check id="disclose-bio" checked={draft.disclose.bio && draft.bio.trim() !== ""} disabled={draft.bio.trim() === ""}
             onChange={(v) => updateDraft({ disclose: { ...draft.disclose, bio: v } })}>
-            상세 소개 {draft.bio.trim() === "" && <span className="text-muted">(작성하지 않음)</span>}
+            자기소개 {draft.bio.trim() === "" && <span className="text-muted">(작성하지 않음)</span>}
           </Check>
           <p className="pt-2 text-[13px] leading-relaxed text-muted">
-            취향·상대 선호·가능한 일정·예산은 상대에게 보이지 않고 운영자만 소개에 참고해요.
+            태어난 연도·성별·흡연 여부·취향·상대 선호·가능한 일정·예산은 상대에게 그대로 보이지 않고, 운영자가 소개할 때만 참고해요.
             소개는 두 분이 모두 공개에 동의한 내용만 전달돼요.
           </p>
         </Card>
@@ -148,7 +151,7 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
       <p className="text-center text-[13px] text-muted">
         수정이 필요하면 <Link href="/apply/1" className="underline">1단계</Link>부터 다시 볼 수 있어요. 입력값은 그대로 남아 있어요.
       </p>
-      <StepActions valid={valid} busy={busy} nextLabel="신청 제출하기" onPrev={() => router.push("/apply/3")} onNext={onSubmit} />
+      <StepActions valid={valid} busy={busy} nextLabel="신청 제출하기" onPrev={() => router.push("/apply/4")} onNext={onSubmit} />
     </div>
   );
 }
@@ -156,7 +159,7 @@ function Confirm({ draft, onBusy }: { draft: ApplicationDraft; onBusy: (b: boole
 export default function ConfirmPage() {
   const [hold, setHold] = useState(false);
   return (
-    <ApplyShell step={4} title="제출 전에 확인해주세요" holdGuard={hold}>
+    <ApplyShell step={5} title="제출 전에 확인해주세요" holdGuard={hold}>
       {(d) => <Confirm draft={d} onBusy={setHold} />}
     </ApplyShell>
   );

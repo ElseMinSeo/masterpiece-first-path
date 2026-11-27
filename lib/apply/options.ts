@@ -1,4 +1,13 @@
-// 신청서 선택지. 문구는 시안 10·11을 따르고, 시안에 없는 2단계/확인 단계는 명세 기준으로 정의했다.
+// 신청서 선택지.
+// 1·2단계는 새 Figma 시안(Matching1·2), 3·4단계는 시안 10·11, 제출 전 확인은 START.md 명세를 따른다.
+// 시안의 '키워드' 자리 선택지(취미·선호 장소)는 임시안이다.
+
+export const GENDERS = ["남성", "여성"] as const;
+export const SMOKING = ["흡연", "비흡연"] as const;
+export const HOBBIES = ["운동", "독서", "영화·드라마", "음악", "여행", "요리", "사진", "게임", "전시 관람"] as const;
+export const PREFERRED_PLACES = ["맛집", "카페", "바", "전시·공연", "공원·산책", "팝업 스토어"] as const;
+export const NICKNAME_MAX = 12;
+
 export const PERSONALITIES = [
   "활발한", "조용한", "웃긴", "지적인", "엉뚱한", "어른스러운", "애교있는", "다정한", "솔직한",
 ] as const;
@@ -7,7 +16,6 @@ export const CONTACT_STYLES = ["자주", "적당히", "필요 시"] as const;
 
 export const MOODS = ["조용한", "아늑한", "활기찬", "감성적인", "뷰가 좋은"] as const;
 export const FOODS = ["한식", "양식", "일식", "중식", "카페·디저트", "와인·바"] as const;
-export const DATE_STYLES = ["식사", "카페 대화", "산책", "전시·공연", "가볍게 한잔"] as const;
 export const AVOID_PLACES = ["시끄러운 곳", "좁은 좌석", "웨이팅 긴 곳", "술 위주 매장", "고가 매장"] as const;
 
 export const TEMPOS = ["바로 가능", "일정 확인 후 결정"] as const;

@@ -49,7 +49,7 @@ export default function DailyPage() {
               <li key={post.id} id={post.id} className="scroll-mt-16">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <p className="flex items-center gap-2 text-[14px] font-semibold">
-                    <span className="grid size-8 place-items-center rounded-full bg-brand-soft text-[12px] text-brand">운영</span>
+                    <span className="grid size-8 place-items-center rounded-full bg-brand-soft text-[12px] text-brand-ink">운영</span>
                     첫, 길 운영팀
                   </p>
                   <span className="text-[12px] text-muted">{post.publishedAt}</span>

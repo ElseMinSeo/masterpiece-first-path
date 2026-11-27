@@ -16,7 +16,7 @@ export function Field({
     <Tag className="mb-8 min-w-0" data-field={id} aria-describedby={error ? errId : undefined}>
       <LabelTag className="mb-3 flex w-full items-center justify-between gap-3">
         <span className="text-[15px] font-semibold">{label}</span>
-        {hint && <span className={cx("shrink-0 text-[14px]", hintTone === "brand" ? "text-brand" : "text-muted")}>{hint}</span>}
+        {hint && <span className={cx("shrink-0 text-[14px]", hintTone === "brand" ? "text-brand-ink" : "text-muted")}>{hint}</span>}
       </LabelTag>
       {children}
       {error && (
@@ -26,7 +26,7 @@ export function Field({
   );
 }
 
-/** 선택 태그 (시안 10의 성격 칩) */
+/** 선택 태그 (새 시안 Matching2: 선택 시 핑크 채움, 기본은 회색 채움) */
 export function TagChip({ selected, onClick, children, disabled }: { selected: boolean; onClick: () => void; children: ReactNode; disabled?: boolean }) {
   return (
     <button
@@ -35,13 +35,34 @@ export function TagChip({ selected, onClick, children, disabled }: { selected: b
       disabled={disabled}
       onClick={onClick}
       className={cx(
-        "min-h-10 rounded-full border px-4 text-[15px] transition-colors",
-        selected ? "border-brand bg-brand-soft text-brand" : "border-line bg-white text-ink/70",
+        "min-h-11 rounded-full px-5 text-[15px] transition-colors",
+        selected ? "bg-brand font-semibold text-white" : "bg-field text-ink/80",
         disabled && !selected && "opacity-40",
       )}
     >
       {children}
     </button>
+  );
+}
+
+/** 둘 중 하나 고르는 큰 버튼 (새 시안: 남성/여성, 흡연/비흡연) */
+export function SegmentGroup<T extends string>({ options, value, onChange, label }: {
+  options: readonly T[]; value: string; onChange: (v: T) => void; label: string;
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex gap-3">
+      {options.map((o) => (
+        <button
+          key={o} type="button" role="radio" aria-checked={value === o} onClick={() => onChange(o)}
+          className={cx(
+            "min-h-13 flex-1 rounded-full text-[16px] transition-colors",
+            value === o ? "bg-brand font-semibold text-white" : "bg-field text-ink",
+          )}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -71,7 +92,7 @@ export function OptionCard({ selected, onClick, children, role = "checkbox" }: {
       type="button" role={role} aria-checked={selected} onClick={onClick}
       className={cx(
         "flex min-h-13 min-w-0 flex-1 items-center justify-between gap-1.5 rounded-xl border px-3 py-3 text-left text-[15px] max-[359px]:justify-center",
-        selected ? "border-brand bg-brand-soft text-brand" : "border-line bg-white text-ink/60",
+        selected ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-white text-ink/60",
       )}
     >
       <span className="min-w-0 break-keep [overflow-wrap:normal]">{children}</span>
@@ -123,18 +144,19 @@ export function TextArea({ value, onChange, placeholder, maxLength, invalid, id,
   );
 }
 
-/** 1~3단계 표시 (시안 10·11) */
-export function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+/** 단계 표시 (새 시안: 4단계) */
+export function StepIndicator({ current, total = 4 }: { current: number; total?: number }) {
+  const steps = Array.from({ length: total }, (_, i) => i + 1);
   return (
-    <ol aria-label={`3단계 중 ${current}단계`} className="flex items-center justify-center">
-      {[1, 2, 3].map((n, i) => (
+    <ol aria-label={`${total}단계 중 ${Math.min(current, total)}단계`} className="flex items-center justify-center">
+      {steps.map((n, i) => (
         <li key={n} className="flex items-center">
-          {i > 0 && <span aria-hidden className={cx("h-px w-7", n <= current ? "bg-brand" : "bg-line")} />}
+          {i > 0 && <span aria-hidden className={cx("h-px w-5", n <= current ? "bg-brand" : "bg-line")} />}
           <span
             aria-current={n === current ? "step" : undefined}
             className={cx(
-              "grid size-10 place-items-center rounded-full border text-[16px] font-semibold",
-              n <= current ? "border-brand bg-brand text-white" : "border-line bg-white text-muted",
+              "grid size-9 place-items-center rounded-full border text-[16px]",
+              n <= current ? "border-brand bg-brand font-semibold text-white" : "border-line bg-white text-muted",
             )}
           >
             {n}

@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AgeRange } from "@/components/age-range";
 import { ApplyShell, StepActions, useStepValidation } from "@/components/apply-shell";
-import { Field, OptionCard, TagGroup } from "@/components/form";
-import { PERSONALITIES, TEMPOS } from "@/lib/apply/options";
+import { Field, OptionCard, TagGroup, TextInput } from "@/components/form";
+import { CONTACT_STYLES, INTRO_MAX, PERSONALITIES } from "@/lib/apply/options";
 import type { ApplicationDraft } from "@/lib/apply/schema";
 import { useApp } from "@/lib/store";
 
@@ -12,29 +11,32 @@ function Step3({ draft }: { draft: ApplicationDraft }) {
   const { updateDraft } = useApp();
   const router = useRouter();
   const { errors, valid, attempt } = useStepValidation(3, draft);
+  const toggle = (v: string) =>
+    updateDraft({ contactStyles: draft.contactStyles.includes(v) ? draft.contactStyles.filter((x) => x !== v) : [...draft.contactStyles, v] });
+
   return (
-    <div>
-      <Field id="ageMin" label="선호 나이 범위" hint="필수" error={errors.ageMin ?? errors.ageMax}>
-        <AgeRange min={draft.ageMin} max={draft.ageMax} onChange={(ageMin, ageMax) => updateDraft({ ageMin, ageMax })} />
-        <p className="mt-1 text-[12px] text-muted">성인 대상 서비스로 만 20세부터 고를 수 있어요.</p>
+    <form onSubmit={(e) => { e.preventDefault(); if (attempt()) router.push("/apply/4"); }} noValidate>
+      <Field id="personalities" as="fieldset" label="나의 성격" hint="복수선택" error={errors.personalities}>
+        <TagGroup label="나의 성격" options={PERSONALITIES} value={draft.personalities} onChange={(v) => updateDraft({ personalities: v })} />
       </Field>
-      <Field id="partnerPersonalities" as="fieldset" label="선호하는 성격" hint="복수선택" error={errors.partnerPersonalities}>
-        <TagGroup label="선호하는 성격" options={PERSONALITIES} value={draft.partnerPersonalities}
-          onChange={(v) => updateDraft({ partnerPersonalities: v })} />
-      </Field>
-      <Field id="tempo" as="fieldset" label="만남 템포" hint="선택" hintTone="muted" error={errors.tempo}>
-        <div className="flex gap-2" role="radiogroup" aria-label="만남 템포">
-          {TEMPOS.map((t) => (
-            <OptionCard key={t} role="radio" selected={draft.tempo === t}
-              onClick={() => updateDraft({ tempo: draft.tempo === t ? "" : t })}>{t}</OptionCard>
+      <Field id="contactStyles" as="fieldset" label="연락 스타일" hint="복수선택" error={errors.contactStyles}>
+        <div className="flex gap-2">
+          {CONTACT_STYLES.map((c) => (
+            <OptionCard key={c} selected={draft.contactStyles.includes(c)} onClick={() => toggle(c)}>{c}</OptionCard>
           ))}
         </div>
       </Field>
-      <StepActions valid={valid} onPrev={() => router.push("/apply/2")} onNext={() => { if (attempt()) router.push("/apply/confirm"); }} />
-    </div>
+      <Field id="intro" label="한 줄 소개" hint="필수" error={errors.intro}>
+        <TextInput id="intro-input" label="한 줄 소개" value={draft.intro} maxLength={INTRO_MAX}
+          placeholder="예: 조용한 카페 데이트를 좋아해요!" invalid={!!errors.intro}
+          onChange={(v) => updateDraft({ intro: v })} />
+        <p className="mt-1 text-right text-[12px] text-muted">{draft.intro.trim().length}/{INTRO_MAX}</p>
+      </Field>
+      <StepActions valid={valid} onPrev={() => router.push("/apply/2")} onNext={() => { if (attempt()) router.push("/apply/4"); }} />
+    </form>
   );
 }
 
 export default function Step3Page() {
-  return <ApplyShell step={3} title="어떤 사람을 만나고 싶나요?">{(d) => <Step3 draft={d} />}</ApplyShell>;
+  return <ApplyShell step={3} title="나를 조금 더 소개해볼까요?">{(d) => <Step3 draft={d} />}</ApplyShell>;
 }

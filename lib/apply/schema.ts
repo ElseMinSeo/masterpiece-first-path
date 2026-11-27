@@ -1,23 +1,34 @@
 import { z } from "zod";
 import {
-  AGE_MAX, AGE_MIN, AVOID_PLACES, BIO_MAX, BUDGET_MAX, CONTACT_STYLES, DATE_STYLES, FOODS,
-  INTRO_MAX, MAX_DATES, MAX_STATIONS, MAX_TIME_SLOTS, MOODS, PERSONALITIES, STATIONS, TEMPOS, TIME_SLOTS,
+  AGE_MAX, AGE_MIN, AVOID_PLACES, BIO_MAX, BUDGET_MAX, CONTACT_STYLES, FOODS, GENDERS, HOBBIES,
+  INTRO_MAX, MAX_DATES, MAX_STATIONS, MAX_TIME_SLOTS, MOODS, NICKNAME_MAX, PERSONALITIES,
+  PREFERRED_PLACES, SMOKING, STATIONS, TEMPOS, TIME_SLOTS,
 } from "./options";
-import { upcomingDates } from "./dates";
+import { seoulDateString, upcomingDates } from "./dates";
 
 export interface ApplicationDraft {
+  // 1단계 기본 정보
+  nickname: string;
+  birthYear: number | null;
+  gender: string;
+  bio: string;
+  // 2단계 취향
+  hobbies: string[];
+  preferredPlaces: string[];
+  moods: string[];
+  foods: string[];
+  avoidPlaces: string[];
+  smoking: string;
+  // 3단계 나
   personalities: string[];
   contactStyles: string[];
   intro: string;
-  bio: string;
-  moods: string[];
-  foods: string[];
-  dateStyles: string[];
-  avoidPlaces: string[];
+  // 4단계 상대
   ageMin: number;
   ageMax: number;
   partnerPersonalities: string[];
   tempo: string;
+  // 제출 전 확인
   stations: string[];
   dates: string[];
   timeSlots: string[];
@@ -32,13 +43,28 @@ export interface ApplicationDraft {
 
 export function emptyDraft(idempotencyKey: string): ApplicationDraft {
   return {
-    personalities: [], contactStyles: [], intro: "", bio: "",
-    moods: [], foods: [], dateStyles: [], avoidPlaces: [],
+    nickname: "", birthYear: null, gender: "", bio: "",
+    hobbies: [], preferredPlaces: [], moods: [], foods: [], avoidPlaces: [], smoking: "",
+    personalities: [], contactStyles: [], intro: "",
     ageMin: 25, ageMax: 35, partnerPersonalities: [], tempo: "",
     stations: [], dates: [], timeSlots: [], budgetMin: null, budgetMax: null,
     disclose: { personalities: true, intro: true, bio: false },
     confirmed: false, idempotencyKey, updatedAt: new Date().toISOString(),
   };
+}
+
+/** 예전 형식으로 저장된 초안에 빠진 칸을 채운다 */
+export function normalizeDraft(raw: Partial<ApplicationDraft> & { idempotencyKey: string }): ApplicationDraft {
+  const base = emptyDraft(raw.idempotencyKey);
+  return { ...base, ...raw, disclose: { ...base.disclose, ...(raw.disclose ?? {}) } };
+}
+
+/** 고를 수 있는 출생 연도: 올해 기준 만 AGE_MIN~AGE_MAX세 (자기 신고값, 본인확인 아님) */
+export function birthYearOptions(now: Date = new Date()): number[] {
+  const year = Number(seoulDateString(now).slice(0, 4));
+  const out: number[] = [];
+  for (let y = year - AGE_MIN; y >= year - AGE_MAX; y--) out.push(y);
+  return out;
 }
 
 const tags = <T extends readonly string[]>(opts: T, min: number, minMsg: string, max?: number, maxMsg?: string) => {
@@ -48,7 +74,35 @@ const tags = <T extends readonly string[]>(opts: T, min: number, minMsg: string,
   return s.refine((a) => new Set(a).size === a.length, { message: "중복 선택이 있어요." });
 };
 
-export const step1Schema = z.object({
+const oneOf = <T extends readonly string[]>(opts: T, msg: string) =>
+  z.string().refine((v) => (opts as readonly string[]).includes(v), { message: msg });
+
+export function step1Schema(now: Date = new Date()) {
+  const years = new Set(birthYearOptions(now));
+  return z.object({
+    nickname: z.string().transform((s) => s.trim()).pipe(
+      z.string()
+        .min(1, { message: "닉네임을 입력해주세요." })
+        .max(NICKNAME_MAX, { message: `닉네임은 ${NICKNAME_MAX}자 이내로 써주세요.` }),
+    ),
+    birthYear: z.number({ message: "태어난 연도를 선택해주세요." }).nullable()
+      .refine((v) => v !== null, { message: "태어난 연도를 선택해주세요." })
+      .refine((v) => v === null || years.has(v), { message: `만 ${AGE_MIN}~${AGE_MAX}세만 신청할 수 있어요.` }),
+    gender: oneOf(GENDERS, "성별을 선택해주세요."),
+    bio: z.string().max(BIO_MAX, { message: `자기소개는 ${BIO_MAX}자 이내로 써주세요.` }),
+  });
+}
+
+export const step2Schema = z.object({
+  hobbies: tags(HOBBIES, 1, "취미를 1개 이상 골라주세요."),
+  preferredPlaces: tags(PREFERRED_PLACES, 1, "선호 장소를 1개 이상 골라주세요."),
+  moods: tags(MOODS, 1, "선호하는 분위기를 1개 이상 골라주세요."),
+  foods: tags(FOODS, 1, "좋아하는 음식을 1개 이상 골라주세요."),
+  avoidPlaces: tags(AVOID_PLACES, 0, ""),
+  smoking: oneOf(SMOKING, "흡연 여부를 선택해주세요."),
+});
+
+export const step3Schema = z.object({
   personalities: tags(PERSONALITIES, 1, "나의 성격을 1개 이상 골라주세요."),
   contactStyles: tags(CONTACT_STYLES, 1, "연락 스타일을 1개 이상 골라주세요."),
   intro: z
@@ -59,17 +113,9 @@ export const step1Schema = z.object({
         .min(1, { message: "한 줄 소개를 입력해주세요. 공백만으로는 저장되지 않아요." })
         .max(INTRO_MAX, { message: `한 줄 소개는 ${INTRO_MAX}자 이내로 써주세요.` }),
     ),
-  bio: z.string().max(BIO_MAX, { message: `상세 소개는 ${BIO_MAX}자 이내로 써주세요.` }),
 });
 
-export const step2Schema = z.object({
-  moods: tags(MOODS, 1, "선호하는 분위기를 1개 이상 골라주세요."),
-  foods: tags(FOODS, 1, "선호하는 음식을 1개 이상 골라주세요."),
-  dateStyles: tags(DATE_STYLES, 1, "데이트 스타일을 1개 이상 골라주세요."),
-  avoidPlaces: tags(AVOID_PLACES, 0, ""),
-});
-
-export const step3Schema = z
+export const step4Schema = z
   .object({
     ageMin: z.number().int().min(AGE_MIN, { message: `${AGE_MIN}살 이상만 고를 수 있어요.` }).max(AGE_MAX),
     ageMax: z.number().int().min(AGE_MIN).max(AGE_MAX, { message: `${AGE_MAX}살 이하로 골라주세요.` }),
@@ -111,7 +157,9 @@ export function confirmSchema(now: Date = new Date()) {
     });
 }
 
-export type StepKey = 1 | 2 | 3 | 4; // 4 = 제출 전 확인
+/** 1~4 = 신청 단계, 5 = 제출 전 확인 */
+export type StepKey = 1 | 2 | 3 | 4 | 5;
+export const STEPS: readonly StepKey[] = [1, 2, 3, 4, 5];
 export type FieldErrors = Partial<Record<string, string>>;
 
 function toErrors(result: { success: boolean; error?: z.ZodError }): FieldErrors {
@@ -126,16 +174,17 @@ function toErrors(result: { success: boolean; error?: z.ZodError }): FieldErrors
 
 export function validateStep(step: StepKey, draft: ApplicationDraft, now: Date = new Date()): FieldErrors {
   switch (step) {
-    case 1: return toErrors(step1Schema.safeParse(draft));
+    case 1: return toErrors(step1Schema(now).safeParse(draft));
     case 2: return toErrors(step2Schema.safeParse(draft));
     case 3: return toErrors(step3Schema.safeParse(draft));
-    case 4: return toErrors(confirmSchema(now).safeParse(draft));
+    case 4: return toErrors(step4Schema.safeParse(draft));
+    case 5: return toErrors(confirmSchema(now).safeParse(draft));
   }
 }
 
 /** 처음으로 통과하지 못한 단계. 모두 통과하면 null */
 export function firstInvalidStep(draft: ApplicationDraft, now: Date = new Date()): StepKey | null {
-  for (const s of [1, 2, 3, 4] as const) {
+  for (const s of STEPS) {
     if (Object.keys(validateStep(s, draft, now)).length > 0) return s;
   }
   return null;
@@ -144,14 +193,15 @@ export function firstInvalidStep(draft: ApplicationDraft, now: Date = new Date()
 /** 제출 시 서버(현재는 데모 저장소)가 다시 검증하는 전체 스키마 */
 export function parseSubmission(draft: ApplicationDraft, now: Date = new Date()) {
   const errors: FieldErrors = {};
-  for (const s of [1, 2, 3, 4] as const) Object.assign(errors, validateStep(s, draft, now));
+  for (const s of STEPS) Object.assign(errors, validateStep(s, draft, now));
   if (Object.keys(errors).length > 0) return { ok: false as const, errors };
   return {
     ok: true as const,
     value: {
-      ...step1Schema.parse(draft),
+      ...step1Schema(now).parse(draft),
       ...step2Schema.parse(draft),
       ...step3Schema.parse(draft),
+      ...step4Schema.parse(draft),
       ...confirmSchema(now).parse(draft),
     },
   };

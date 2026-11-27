@@ -2,46 +2,65 @@
 
 import { useRouter } from "next/navigation";
 import { ApplyShell, StepActions, useStepValidation } from "@/components/apply-shell";
-import { Field, OptionCard, TagGroup, TextArea, TextInput } from "@/components/form";
-import { BIO_MAX, CONTACT_STYLES, INTRO_MAX, PERSONALITIES } from "@/lib/apply/options";
-import type { ApplicationDraft } from "@/lib/apply/schema";
+import { Field, SegmentGroup, TextArea, TextInput } from "@/components/form";
+import { cx } from "@/components/ui";
+import { BIO_MAX, GENDERS, NICKNAME_MAX } from "@/lib/apply/options";
+import { birthYearOptions, type ApplicationDraft } from "@/lib/apply/schema";
 import { useApp } from "@/lib/store";
 
 function Step1({ draft }: { draft: ApplicationDraft }) {
   const { updateDraft } = useApp();
   const router = useRouter();
   const { errors, valid, attempt } = useStepValidation(1, draft);
-  const toggle = (v: string) =>
-    updateDraft({ contactStyles: draft.contactStyles.includes(v) ? draft.contactStyles.filter((x) => x !== v) : [...draft.contactStyles, v] });
-
+  const next = () => { if (attempt()) router.push("/apply/2"); };
   return (
-    <form onSubmit={(e) => { e.preventDefault(); if (attempt()) router.push("/apply/2"); }} noValidate>
-      <Field id="personalities" as="fieldset" label="나의 성격" hint="복수선택" error={errors.personalities}>
-        <TagGroup label="나의 성격" options={PERSONALITIES} value={draft.personalities} onChange={(v) => updateDraft({ personalities: v })} />
+    <form onSubmit={(e) => { e.preventDefault(); next(); }} noValidate>
+      <Field id="nickname" label="닉네임" hint="필수" error={errors.nickname}>
+        <TextInput id="nickname-input" label="닉네임" value={draft.nickname} maxLength={NICKNAME_MAX}
+          placeholder="상대에게 보여줄 이름을 입력해주세요" invalid={!!errors.nickname}
+          onChange={(v) => updateDraft({ nickname: v })} />
+        <p className="mt-1 text-[12px] text-muted">실명은 받지 않아요. 소개할 때 이 닉네임으로 불러드려요.</p>
       </Field>
-      <Field id="contactStyles" as="fieldset" label="연락 스타일" hint="복수선택" error={errors.contactStyles}>
-        <div className="flex gap-2">
-          {CONTACT_STYLES.map((c) => (
-            <OptionCard key={c} selected={draft.contactStyles.includes(c)} onClick={() => toggle(c)}>{c}</OptionCard>
-          ))}
+
+      <Field id="birthYear" label="태어난 연도" hint="필수" error={errors.birthYear}>
+        <div className="relative">
+          <select
+            id="birth-year" aria-label="태어난 연도" aria-invalid={!!errors.birthYear || undefined}
+            value={draft.birthYear ?? ""}
+            onChange={(e) => updateDraft({ birthYear: e.target.value === "" ? null : Number(e.target.value) })}
+            className={cx(
+              "h-13 w-full appearance-none rounded-xl bg-field px-4 pr-10 text-[16px] outline-none focus:ring-2 focus:ring-brand/40",
+              draft.birthYear === null && "text-muted",
+              errors.birthYear && "ring-2 ring-red-400",
+            )}
+          >
+            <option value="">연도를 선택해주세요</option>
+            {birthYearOptions().map((y) => <option key={y} value={y}>{y}년</option>)}
+          </select>
+          <span aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-ink/50">⌄</span>
         </div>
+        <p className="mt-1 text-[12px] text-muted">직접 입력한 값이에요. 성인·본인 확인은 다음 단계에서 따로 진행해요.</p>
       </Field>
-      <Field id="intro" label="한 줄 소개" hint="필수" error={errors.intro}>
-        <TextInput id="intro-input" label="한 줄 소개" value={draft.intro} maxLength={INTRO_MAX}
-          placeholder="예: 조용한 카페 데이트를 좋아해요!" invalid={!!errors.intro}
-          onChange={(v) => updateDraft({ intro: v })} />
-        <p className="mt-1 text-right text-[12px] text-muted">{draft.intro.trim().length}/{INTRO_MAX}</p>
+
+      <Field id="gender" as="fieldset" label="성별" hint="필수" error={errors.gender}>
+        <SegmentGroup label="성별" options={GENDERS} value={draft.gender} onChange={(v) => updateDraft({ gender: v })} />
       </Field>
-      <Field id="bio" label="상세 소개" hint="선택" hintTone="muted" error={errors.bio}>
-        <TextArea id="bio-input" label="상세 소개" value={draft.bio} maxLength={BIO_MAX}
-          placeholder="더 자세한 이야기를 들려주세요." invalid={!!errors.bio}
+
+      <Field id="bio" label="자기소개" hint="선택" hintTone="muted" error={errors.bio}>
+        <TextArea id="bio-input" label="자기소개" value={draft.bio} maxLength={BIO_MAX}
+          placeholder="간단한 소개를 작성해주세요" invalid={!!errors.bio}
           onChange={(v) => updateDraft({ bio: v })} />
       </Field>
-      <StepActions valid={valid} onNext={() => { if (attempt()) router.push("/apply/2"); }} />
+
+      <StepActions valid={valid} onNext={next} />
     </form>
   );
 }
 
 export default function Step1Page() {
-  return <ApplyShell step={1} title="나를 조금 더 소개해볼까요?">{(d) => <Step1 draft={d} />}</ApplyShell>;
+  return (
+    <ApplyShell step={1} title={"당신에게 어울리는\n설렘을 추천해드릴게요."} subtitle="매칭 신청을 위해 기본 정보를 입력해주세요.">
+      {(d) => <Step1 draft={d} />}
+    </ApplyShell>
+  );
 }

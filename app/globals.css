@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #ff3374;
-  --color-brand-dark: #e61e5f;
-  --color-brand-soft: #ffe8ef;
+  /* 새 시안(2026-11) 기준 강조색. 흰 배경의 작은 글씨에는 대비 4.5:1을 넘는 brand-ink를 쓴다 */
+  --color-brand: #ef5fb4;
+  --color-brand-dark: #d94a9f;
+  --color-brand-ink: #c2338a;
+  --color-brand-soft: #fde7f3;
   --color-ink: #1f1f1f;
   --color-muted: #9a9a9a;
   --color-line: #e7e7e7;
@@ -29,7 +31,7 @@ body {
 }
 
 .brand-gradient {
-  background: linear-gradient(120deg, #ff3374 0%, #ff7a7a 100%);
+  background: linear-gradient(120deg, #ef5fb4 0%, #f58ac6 100%);
 }
 
 :focus-visible {
@@ -54,4 +56,4 @@ body {
 }
 .range-dual input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
 .range-dual input[type="range"]:focus-visible { outline: none; }
-.range-dual input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 3px solid rgb(255 51 116 / 0.4); }
+.range-dual input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 3px solid rgb(239 95 180 / 0.4); }

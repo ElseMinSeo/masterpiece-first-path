@@ -13,8 +13,9 @@ export function validDraft(key = "key-1"): ApplicationDraft {
   const [d1, d2] = upcomingDates(NOW);
   return {
     ...emptyDraft(key),
-    personalities: ["다정한", "솔직한"], contactStyles: ["적당히"], intro: "조용한 카페 데이트를 좋아해요", bio: "",
-    moods: ["조용한"], foods: ["한식"], dateStyles: ["카페 대화"], avoidPlaces: [],
+    nickname: "봄바람", birthYear: 1996, gender: "여성", bio: "",
+    hobbies: ["독서"], preferredPlaces: ["카페"], moods: ["조용한"], foods: ["한식"], avoidPlaces: [], smoking: "비흡연",
+    personalities: ["다정한", "솔직한"], contactStyles: ["적당히"], intro: "조용한 카페 데이트를 좋아해요",
     ageMin: 27, ageMax: 34, partnerPersonalities: ["다정한"], tempo: "일정 확인 후 결정",
     stations: ["성수", "뚝섬"], dates: [d1!, d2!], timeSlots: ["weekday-evening"],
     budgetMin: 20000, budgetMax: 40000, confirmed: true,

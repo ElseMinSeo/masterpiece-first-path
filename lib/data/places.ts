@@ -25,7 +25,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["창가석", "2인석", "대화하기 좋은"], hoursText: "11:30 ~ 21:30 (15~17시 브레이크)",
     priceMinKrw: 18000, priceMaxKrw: 32000, noise: "moderate", seating: "2인 테이블 8개",
     facilities: ["와이파이", "예약", "화장실 구분"], menu: [
-      { name: "토마토 바질 파스타", priceKrw: 18000 }, { name: "버섯 크림 리조또", priceKrw: 21000 }, { name: "그릴 채소 샐러드", priceKrw: 14000 },
+      { name: "토마토 바질 파스타", description: "생토마토 소스에 바질을 올린 기본 파스타예요. (개발용 예시)", priceKrw: 18000 }, { name: "버섯 크림 리조또", description: "버섯을 듬뿍 넣은 크림 리조또예요. (개발용 예시)", priceKrw: 21000 }, { name: "그릴 채소 샐러드", description: "구운 채소와 발사믹 드레싱 샐러드예요. (개발용 예시)", priceKrw: 14000 },
     ], checkedAt: CHECKED, tone: "#F6D6C8",
   },
   {
@@ -37,7 +37,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["조용한", "디저트", "좌석 간격 넓음"], hoursText: "10:00 ~ 22:00",
     priceMinKrw: 6000, priceMaxKrw: 12000, noise: "quiet", seating: "2~4인석 12개",
     facilities: ["와이파이", "콘센트", "화장실 구분"], menu: [
-      { name: "핸드드립", priceKrw: 7000 }, { name: "바스크 치즈케이크", priceKrw: 7500 },
+      { name: "핸드드립", description: "그날의 원두로 내리는 드립 커피예요. (개발용 예시)", priceKrw: 7000 }, { name: "바스크 치즈케이크", description: "겉은 그을리고 속은 촉촉한 치즈케이크예요. (개발용 예시)", priceKrw: 7500 },
     ], checkedAt: CHECKED, tone: "#E9DCC9",
   },
   {
@@ -49,7 +49,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["정갈한", "1인 한상", "주차 가능"], hoursText: "11:00 ~ 21:00",
     priceMinKrw: 15000, priceMaxKrw: 25000, noise: "quiet", seating: "2인 좌식·입식 혼합",
     facilities: ["주차", "예약", "단체석"], menu: [
-      { name: "제철 한상", priceKrw: 19000 }, { name: "보리굴비 정식", priceKrw: 25000 },
+      { name: "제철 한상", description: "제철 반찬과 국, 솥밥이 나오는 1인 한상이에요. (개발용 예시)", priceKrw: 19000 }, { name: "보리굴비 정식", description: "보리굴비와 녹차물 밥이 함께 나와요. (개발용 예시)", priceKrw: 25000 },
     ], checkedAt: CHECKED, tone: "#DCE6D2",
   },
   {
@@ -61,7 +61,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["바 좌석", "런치 코스"], hoursText: "12:00 ~ 22:00 (15~18시 브레이크)",
     priceMinKrw: 30000, priceMaxKrw: 60000, noise: "quiet", seating: "바 좌석 10석",
     facilities: ["예약", "콜키지"], menu: [
-      { name: "런치 스시 세트", priceKrw: 30000 }, { name: "디너 오마카세", priceKrw: 60000 },
+      { name: "런치 스시 세트", description: "점심에만 나오는 스시 10피스 세트예요. (개발용 예시)", priceKrw: 30000 }, { name: "디너 오마카세", description: "그날 재료로 구성하는 저녁 코스예요. (개발용 예시)", priceKrw: 60000 },
     ], checkedAt: CHECKED, tone: "#F3E3D3",
   },
   {
@@ -73,7 +73,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["딤섬", "나눠먹기"], hoursText: "11:30 ~ 22:00",
     priceMinKrw: 12000, priceMaxKrw: 28000, noise: "lively", seating: "4인 테이블 위주",
     facilities: ["단체석", "주차"], menu: [
-      { name: "새우 하가우", priceKrw: 9000 }, { name: "마파두부 덮밥", priceKrw: 12000 },
+      { name: "새우 하가우", description: "새우가 통으로 들어간 딤섬 4개예요. (개발용 예시)", priceKrw: 9000 }, { name: "마파두부 덮밥", description: "맵기를 조절할 수 있는 마파두부 덮밥이에요. (개발용 예시)", priceKrw: 12000 },
     ], checkedAt: CHECKED, tone: "#F2D0CC",
   },
   {
@@ -85,7 +85,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["논알콜", "칵테일", "저조도"], hoursText: "18:00 ~ 01:00",
     priceMinKrw: 14000, priceMaxKrw: 22000, noise: "moderate", seating: "바 좌석·2인 소파석",
     facilities: ["예약", "화장실 구분"], menu: [
-      { name: "시그니처 칵테일", priceKrw: 16000 }, { name: "논알콜 하이볼", priceKrw: 12000 },
+      { name: "시그니처 칵테일", description: "계절 과일로 만드는 대표 칵테일이에요. (개발용 예시)", priceKrw: 16000 }, { name: "논알콜 하이볼", description: "술 없이 즐기는 하이볼이에요. (개발용 예시)", priceKrw: 12000 },
     ], checkedAt: CHECKED, tone: "#D9D2E9",
   },
   {
@@ -97,7 +97,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["테라스", "브런치", "뷰"], hoursText: "09:00 ~ 20:00",
     priceMinKrw: 16000, priceMaxKrw: 26000, noise: "moderate", seating: "실내 2인석·테라스 6석",
     facilities: ["와이파이", "반려동물 동반"], menu: [
-      { name: "에그 베네딕트", priceKrw: 17000 }, { name: "리코타 샐러드", priceKrw: 15000 },
+      { name: "에그 베네딕트", description: "수란과 홀랜다이즈 소스를 올린 브런치예요. (개발용 예시)", priceKrw: 17000 }, { name: "리코타 샐러드", description: "직접 만든 리코타 치즈를 올린 샐러드예요. (개발용 예시)", priceKrw: 15000 },
     ], checkedAt: CHECKED, tone: "#D3E4EC",
   },
   {
@@ -109,7 +109,7 @@ export const DEV_PLACES: Place[] = [
     keywords: ["코스", "룸", "기념일"], hoursText: "18:00 ~ 22:00 (예약제)",
     priceMinKrw: 65000, priceMaxKrw: 95000, noise: "quiet", seating: "2인 룸 3개",
     facilities: ["예약", "주차", "콜키지"], menu: [
-      { name: "디너 코스", priceKrw: 85000 },
+      { name: "디너 코스", description: "애피타이저부터 디저트까지 6가지 코스예요. (개발용 예시)", priceKrw: 85000 },
     ], checkedAt: CHECKED, tone: "#E7D8D0",
   },
 ];

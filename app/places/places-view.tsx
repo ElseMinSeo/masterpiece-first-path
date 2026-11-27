@@ -65,7 +65,7 @@ export default function PlacesView() {
           aria-label="지역 필터"
           aria-expanded={showStations}
           onClick={() => set({ panel: showStations ? null : "station", station: showStations ? null : station })}
-          className={cx("grid h-10 w-14 shrink-0 place-items-center rounded-full border", station !== "all" ? "border-brand text-brand" : "border-line")}
+          className={cx("grid h-10 w-14 shrink-0 place-items-center rounded-full border", station !== "all" ? "border-brand text-brand-ink" : "border-line")}
         >
           <FilterIcon />
         </button>
@@ -92,7 +92,7 @@ export default function PlacesView() {
             <button
               key={s} type="button" aria-pressed={station === s}
               onClick={() => set({ station: s, panel: "station" })}
-              className={cx("h-9 rounded-full border px-3.5 text-[14px]", station === s ? "border-brand bg-brand-soft text-brand" : "border-line text-ink/70")}
+              className={cx("h-9 rounded-full border px-3.5 text-[14px]", station === s ? "border-brand bg-brand-soft text-brand-ink" : "border-line text-ink/70")}
             >
               {s === "all" ? "모든 역" : `${s}역`}
             </button>

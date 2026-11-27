@@ -40,7 +40,7 @@ export function Button({ variant = "primary", block, className, ...rest }: BtnPr
         variant === "primary" && "bg-brand text-white active:bg-brand-dark disabled:bg-line disabled:text-muted",
         variant === "outline" && "border border-line bg-white text-ink active:bg-gray-50",
         variant === "ghost" && "text-ink",
-        variant === "white" && "bg-white text-brand shadow-sm",
+        variant === "white" && "bg-white text-brand-ink shadow-sm",
         block && "w-full",
         className,
       )}
@@ -56,7 +56,7 @@ export function LinkButton({ href, children, variant = "primary", className }: {
         "inline-flex min-h-12 w-full items-center justify-center rounded-full px-5 text-[16px] font-semibold",
         variant === "primary" && "bg-brand text-white",
         variant === "outline" && "border border-line bg-white text-ink",
-        variant === "white" && "bg-white text-brand shadow-sm",
+        variant === "white" && "bg-white text-brand-ink shadow-sm",
         className,
       )}
     >
@@ -100,5 +100,5 @@ export function Loading() {
 }
 
 export function StatusBadge({ children }: { children: ReactNode }) {
-  return <span className="inline-flex items-center rounded-full bg-brand-soft px-2.5 py-1 text-[12px] font-semibold text-brand">{children}</span>;
+  return <span className="inline-flex items-center rounded-full bg-brand-soft px-2.5 py-1 text-[12px] font-semibold text-brand-ink">{children}</span>;
 }
