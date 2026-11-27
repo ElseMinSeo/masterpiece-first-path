@@ -45,3 +45,11 @@ for (const width of [320, 375, 430]) {
     }
   });
 }
+
+test("검색엔진 노출 차단: 페이지 표시와 응답 헤더", async ({ page }) => {
+  for (const route of ["/", "/home", "/places/dev-001"]) {
+    const res = await page.goto(route);
+    expect(res?.headers()["x-robots-tag"], `${route} 헤더`).toBe("noindex, nofollow");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+  }
+});

@@ -9,3 +9,4 @@
 ## 목록
 - [0001. 기술 스택](0001-tech-stack.md)
 - [0002. 새 Figma 시안 반영](0002-new-figma-alignment.md)
+- [0003. 데모 기간 검색엔진 노출 차단](0003-noindex-during-demo.md)
