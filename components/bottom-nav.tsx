@@ -31,7 +31,7 @@ export function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={cx("flex h-16 flex-col items-center justify-center gap-1 text-[12px]", active ? "text-brand" : "text-ink/80")}
+                className={cx("flex h-16 flex-col items-center justify-center gap-1 text-[12px]", active ? "text-brand-ink" : "text-ink/80")}
               >
                 <Icon filled={active} />
                 {label}

@@ -36,7 +36,7 @@ export function ApplicationCard({ app }: { app: Application }) {
           return (
             <li key={s} className="flex items-center gap-3 text-[14px]" aria-current={now ? "step" : undefined}>
               <span className={cx("grid size-6 shrink-0 place-items-center rounded-full border text-[11px]",
-                done ? "border-brand bg-brand text-white" : now ? "border-brand text-brand" : "border-line text-muted")}>
+                done ? "border-brand bg-brand text-white" : now ? "border-brand text-brand-ink" : "border-line text-muted")}>
                 {done ? <CheckIcon /> : i + 1}
               </span>
               <span className={cx(done || now ? "text-ink" : "text-muted", now && "font-semibold")}>
@@ -48,6 +48,7 @@ export function ApplicationCard({ app }: { app: Application }) {
       </ol>
 
       <dl className="mt-5 grid grid-cols-[76px_1fr] gap-y-2 border-t border-line pt-4 text-[14px]">
+        <dt className="text-muted">닉네임</dt><dd>{d.nickname}</dd>
         <dt className="text-muted">가능한 역</dt><dd>{d.stations.map((s) => `${s}역`).join(", ")}</dd>
         <dt className="text-muted">가능한 날</dt><dd>{d.dates.map(formatDateChip).join(", ")}</dd>
         <dt className="text-muted">시간대</dt><dd>{d.timeSlots.map(slotLabel).join(", ")}</dd>

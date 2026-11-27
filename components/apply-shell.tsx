@@ -7,10 +7,10 @@ import { useActiveApplication, useApp } from "@/lib/store";
 import { StepIndicator } from "./form";
 import { Card, cx, LinkButton, Loading, TopBar } from "./ui";
 
-export const STEP_PATH: Record<StepKey, string> = { 1: "/apply/1", 2: "/apply/2", 3: "/apply/3", 4: "/apply/confirm" };
+export const STEP_PATH: Record<StepKey, string> = { 1: "/apply/1", 2: "/apply/2", 3: "/apply/3", 4: "/apply/4", 5: "/apply/confirm" };
 
-export function ApplyShell({ step, title, holdGuard, children }: {
-  step: StepKey; title: string; holdGuard?: boolean; children: (draft: ApplicationDraft) => ReactNode;
+export function ApplyShell({ step, title, subtitle, holdGuard, children }: {
+  step: StepKey; title: string; subtitle?: string; holdGuard?: boolean; children: (draft: ApplicationDraft) => ReactNode;
 }) {
   const { ready, draft, ensureDraft } = useApp();
   const active = useActiveApplication();
@@ -43,8 +43,9 @@ export function ApplyShell({ step, title, holdGuard, children }: {
         </div>
       ) : (
         <div className="px-5">
-          <h2 className="mt-4 text-center text-[22px] font-bold">{title}</h2>
-          <div className="mt-5 mb-9"><StepIndicator current={step === 4 ? 3 : (step as 1 | 2 | 3)} /></div>
+          <h2 className="mt-4 whitespace-pre-line text-center text-[22px] font-bold leading-snug">{title}</h2>
+          {subtitle && <p className="mt-2 text-center text-[14px] text-ink/70">{subtitle}</p>}
+          <div className="mt-5 mb-9"><StepIndicator current={Math.min(step, 4)} /></div>
           {draft && children(draft)}
         </div>
       )}

@@ -17,7 +17,7 @@ export default function ApplyEntry() {
     if (!ready) return;
     if (active) return router.replace("/appointments");
     const d = draft ?? ensureDraft();
-    router.replace(STEP_PATH[firstInvalidStep(d) ?? 4]);
+    router.replace(STEP_PATH[firstInvalidStep(d) ?? 5]);
   }, [ready, active, draft, ensureDraft, router]);
 
   return <Loading />;

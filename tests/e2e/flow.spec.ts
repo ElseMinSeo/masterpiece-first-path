@@ -22,36 +22,49 @@ test("홈 → 장소 저장 → 매칭 신청 → 완료 → 내 약속 (중복 
   await page.getByRole("link", { name: "저장", exact: true }).click();
   await expect(page.getByTestId("saved-count")).toContainText("1곳");
 
-  // 매칭 신청 1단계: 빈 상태로 다음 → 필드 오류
+  // 매칭 신청 1단계(기본 정보): 빈 상태로 다음 → 필드 오류
   await page.getByRole("link", { name: "홈" }).click();
   await page.getByRole("link", { name: "매칭 시작하기" }).click();
   await expect(page).toHaveURL(/\/apply\/1$/);
+  await expect(page.getByRole("list", { name: "4단계 중 1단계" })).toBeVisible();
   await page.getByTestId("step-next").click();
-  await expect(page.getByText("나의 성격을 1개 이상 골라주세요.")).toBeVisible();
-  await expect(page.getByText("한 줄 소개를 입력해주세요. 공백만으로는 저장되지 않아요.")).toBeVisible();
+  await expect(page.getByText("닉네임을 입력해주세요.")).toBeVisible();
+  await expect(page.getByText("태어난 연도를 선택해주세요.")).toBeVisible();
+  await expect(page.getByText("성별을 선택해주세요.")).toBeVisible();
+  await page.getByLabel("닉네임").fill("봄바람");
+  await page.getByLabel("태어난 연도").selectOption("1996");
+  await page.getByRole("radio", { name: "여성" }).click();
+  await page.getByLabel("자기소개").fill("주말엔 전시를 보러 다녀요.");
+  await page.getByTestId("step-next").click();
+
+  // 2단계(취향) → 새로고침해도 유지
+  await expect(page).toHaveURL(/\/apply\/2$/);
+  await page.getByRole("button", { name: "독서" }).click();
+  await page.getByRole("group", { name: "선호 장소" }).getByRole("button", { name: "카페" }).click();
+  await page.getByRole("button", { name: "아늑한" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "독서" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "한식" }).click();
+  await page.getByTestId("step-next").click();
+  await expect(page.getByText("흡연 여부를 선택해주세요.")).toBeVisible();
+  await page.getByRole("radio", { name: "비흡연" }).click();
+  await page.getByRole("button", { name: "이전" }).click();
+  await expect(page.getByLabel("닉네임")).toHaveValue("봄바람");
+  await page.getByTestId("step-next").click();
+  await page.getByTestId("step-next").click();
+
+  // 3단계(나): 공백 한 줄 소개 거절
+  await expect(page).toHaveURL(/\/apply\/3$/);
   await page.getByLabel("한 줄 소개").fill("   ");
   await page.getByTestId("step-next").click();
-  await expect(page).toHaveURL(/\/apply\/1$/);
-
+  await expect(page.getByText("한 줄 소개를 입력해주세요. 공백만으로는 저장되지 않아요.")).toBeVisible();
   await page.getByRole("button", { name: "다정한" }).click();
   await page.getByRole("checkbox", { name: "적당히" }).click();
   await page.getByLabel("한 줄 소개").fill("조용한 카페에서 천천히 이야기 나누는 걸 좋아해요");
   await page.getByTestId("step-next").click();
 
-  // 2단계 → 새로고침해도 유지
-  await expect(page).toHaveURL(/\/apply\/2$/);
-  await page.getByRole("button", { name: "아늑한" }).click();
-  await page.getByRole("button", { name: "한식" }).click();
-  await page.reload();
-  await expect(page.getByRole("button", { name: "아늑한" })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "카페 대화" }).click();
-  await page.getByRole("button", { name: "이전" }).click();
-  await expect(page.getByLabel("한 줄 소개")).toHaveValue("조용한 카페에서 천천히 이야기 나누는 걸 좋아해요");
-  await page.getByTestId("step-next").click();
-  await page.getByTestId("step-next").click();
-
-  // 3단계
-  await expect(page).toHaveURL(/\/apply\/3$/);
+  // 4단계(상대)
+  await expect(page).toHaveURL(/\/apply\/4$/);
   await page.getByRole("radio", { name: "일정 확인 후 결정" }).click();
   await page.getByTestId("step-next").click();
 
@@ -72,6 +85,7 @@ test("홈 → 장소 저장 → 매칭 신청 → 완료 → 내 약속 (중복 
   await expect(page.getByText("최대 예산은 최소 예산보다 크거나 같아야 해요.")).toBeVisible();
   await page.getByLabel("1인 최대 예산(원)").fill("50000");
   await expect(page.getByTestId("preview-intro")).toContainText("조용한 카페");
+  await expect(page.getByTestId("preview-nickname")).toHaveText("봄바람");
 
   // 연속 클릭: 같은 틱에 세 번 + 더블클릭
   await page.getByTestId("step-next").evaluate((b: HTMLButtonElement) => { b.click(); b.click(); b.click(); });
@@ -103,16 +117,16 @@ test("신청 중 다른 탭으로 나갔다 프로필에서 돌아와도 같은 
   await fresh(page);
   await page.goto("/apply");
   await expect(page).toHaveURL(/\/apply\/1$/);
-  await page.getByRole("button", { name: "솔직한" }).click();
-  await page.getByLabel("상세 소개").fill("주말엔 전시 보러 다녀요.");
+  await page.getByLabel("닉네임").fill("새벽별");
+  await page.getByLabel("자기소개").fill("주말엔 전시 보러 다녀요.");
   await page.getByRole("link", { name: "장소" }).click();
   await page.getByRole("link", { name: "프로필" }).click();
   await page.getByRole("link", { name: "작성 중인 신청 이어서 하기" }).click();
   await expect(page).toHaveURL(/\/apply\/1$/);
-  await expect(page.getByRole("button", { name: "솔직한" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByLabel("상세 소개")).toHaveValue("주말엔 전시 보러 다녀요.");
+  await expect(page.getByLabel("닉네임")).toHaveValue("새벽별");
+  await expect(page.getByLabel("자기소개")).toHaveValue("주말엔 전시 보러 다녀요.");
   // 단계 건너뛰기 방지
-  await page.goto("/apply/3");
+  await page.goto("/apply/4");
   await expect(page).toHaveURL(/\/apply\/1$/);
 });
 
@@ -130,6 +144,19 @@ test("필터 결과 없음, 빈 저장 목록, 빈 약속", async ({ page }) => 
   await page.getByRole("button", { name: "필터 초기화" }).click();
   await expect(page.getByTestId("place-card")).toHaveCount(8);
 
+  await page.goto("/places/dev-001");
+  await page.getByRole("tab", { name: "메뉴" }).click();
+  await expect(page.getByTestId("menu-list").getByRole("listitem")).toHaveCount(3);
+
+  // 홈 바로가기 → 카테고리 필터, 동네별 추천 → 역 필터
+  await page.goto("/home");
+  await page.getByRole("navigation", { name: "바로가기" }).getByRole("link", { name: "카페" }).click();
+  await expect(page.getByTestId("place-card")).toHaveCount(1);
+  await page.goto("/home");
+  await page.getByRole("link", { name: "서울숲 2곳" }).click();
+  await expect(page.getByTestId("place-card")).toHaveCount(2);
+
+  await page.goto("/places");
   await page.getByRole("button", { name: "지역 필터" }).click();
   await page.getByRole("button", { name: "서울숲역" }).click();
   await expect(page.getByTestId("place-card")).toHaveCount(2);

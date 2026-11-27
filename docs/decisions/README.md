@@ -8,3 +8,4 @@
 
 ## 목록
 - [0001. 기술 스택](0001-tech-stack.md)
+- [0002. 새 Figma 시안 반영](0002-new-figma-alignment.md)

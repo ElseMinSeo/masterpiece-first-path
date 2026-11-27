@@ -100,16 +100,31 @@ export default function PlaceDetail({ place }: { place: Place }) {
           </section>
         </div>
       ) : (
-        <div className="bg-white px-5 py-6" role="tabpanel">
-          <ul className="divide-y divide-line">
-            {place.menu.map((m) => (
-              <li key={m.name} className="flex justify-between gap-3 py-3 text-[15px]">
-                <span className="min-w-0">{m.name}</span>
-                <span className="shrink-0 font-semibold">{formatKrw(m.priceKrw)}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-[12px] text-muted">메뉴와 가격은 개발용 예시이며 정보 확인일은 {place.checkedAt}이에요.</p>
+        <div role="tabpanel">
+          <section className="bg-white px-5 py-6">
+            <SectionTitle>메뉴판</SectionTitle>
+            <div className="-mx-5 flex gap-2 overflow-x-auto px-5 [scrollbar-width:none]">
+              {[0, 1, 2, 3].map((i) => (
+                <PlaceThumb key={i} place={place} className="size-[120px] shrink-0" label="메뉴판 사진 준비 중" />
+              ))}
+            </div>
+          </section>
+          <section className="mt-2 bg-white px-5 py-6">
+            <SectionTitle>전체 메뉴</SectionTitle>
+            <ul className="space-y-4" data-testid="menu-list">
+              {place.menu.map((m) => (
+                <li key={m.name} className="flex gap-4">
+                  <PlaceThumb place={place} className="size-[104px] shrink-0" label="" />
+                  <div className="min-w-0 flex-1 py-1">
+                    <p className="text-[16px] font-semibold">{m.name}</p>
+                    <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-ink/60">{m.description}</p>
+                    <p className="mt-2 text-[16px] font-bold">{formatKrw(m.priceKrw)}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 text-[12px] text-muted">메뉴·가격·사진은 개발용 예시이며 정보 확인일은 {place.checkedAt}이에요.</p>
+          </section>
         </div>
       )}
 

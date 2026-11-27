@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const ROUTES = ["/", "/home", "/places", "/places/dev-001", "/daily", "/saved", "/appointments", "/profile", "/apply/1", "/apply/2", "/apply/3", "/apply/confirm"];
+const ROUTES = ["/", "/home", "/places", "/places/dev-001", "/daily", "/saved", "/appointments", "/profile", "/apply/1", "/apply/2", "/apply/3", "/apply/4", "/apply/confirm"];
 const LONG = "가나다라마바사아자차카타파하".repeat(6).slice(0, 80);
 
 async function seedDraft(page: Page) {
@@ -10,8 +10,9 @@ async function seedDraft(page: Page) {
     const t = new Date(Date.now() + 86400000);
     const ymd = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(t);
     localStorage.setItem("cheotgil.demo.v1.draft", JSON.stringify({
-      personalities: ["다정한"], contactStyles: ["자주"], intro, bio: intro.repeat(5),
-      moods: ["조용한"], foods: ["한식"], dateStyles: ["식사"], avoidPlaces: [],
+      nickname: "열두글자닉네임입니다요", birthYear: 1995, gender: "남성", bio: intro.repeat(5),
+      hobbies: ["영화·드라마", "전시 관람"], preferredPlaces: ["팝업 스토어"], moods: ["조용한"], foods: ["한식"], avoidPlaces: [], smoking: "비흡연",
+      personalities: ["다정한"], contactStyles: ["자주"], intro,
       ageMin: 25, ageMax: 35, partnerPersonalities: [], tempo: "",
       stations: ["성수"], dates: [ymd], timeSlots: ["weekend-lunch"], budgetMin: 10000, budgetMax: 30000,
       disclose: { personalities: true, intro: true, bio: true }, confirmed: false,

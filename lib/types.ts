@@ -4,6 +4,7 @@ export type NoiseLevel = "quiet" | "moderate" | "lively";
 
 export interface MenuItem {
   name: string;
+  description: string;
   priceKrw: number;
 }
 

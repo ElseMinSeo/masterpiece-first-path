@@ -30,7 +30,7 @@ Next.js 16 App Router · React 19 · TypeScript strict · Tailwind CSS 4 · Zod 
 ## 폴더 구조
 
 ```
-app/                 화면 (home, places, places/[id], daily, saved, appointments, profile, apply/1·2·3·confirm·done)
+app/                 화면 (home, places, places/[id], daily, saved, appointments, profile, apply/1·2·3·4·confirm·done)
 components/          재사용 UI: TopBar, BottomNav, Button, Card, TagChip, OptionCard, TextInput, StepIndicator,
                      PlaceCard, BookmarkButton, ApplicationCard, AgeRange
 lib/apply/           신청서 선택지, Zod 검증(단계별·제출 전체), 날짜 도우미

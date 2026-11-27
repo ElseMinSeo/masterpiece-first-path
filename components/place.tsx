@@ -81,3 +81,22 @@ export function MiniPlaceCard({ place }: { place: Place }) {
     </div>
   );
 }
+
+/** 새 홈 시안의 장소 타일: 정사각 사진 + (작은 썸네일) 동네·이름 + 저장 */
+export function PlaceTile({ place, withAvatar, className }: { place: Place; withAvatar?: boolean; className?: string }) {
+  return (
+    <div className={cx("min-w-0", className)} data-testid="place-tile">
+      <Link href={`/places/${place.id}`} aria-label={`${place.name} 상세 보기`} className="block">
+        <PlaceThumb place={place} className="aspect-square w-full" />
+      </Link>
+      <div className="mt-2 flex items-center gap-2">
+        {withAvatar && <PlaceThumb place={place} className="size-8 shrink-0 rounded-lg" label="" />}
+        <Link href={`/places/${place.id}`} className="min-w-0 flex-1">
+          <p className="truncate text-[12px] text-ink/60">{place.district}</p>
+          <p className="truncate text-[15px] font-semibold">{place.name}</p>
+        </Link>
+        <BookmarkButton place={place} className="-mr-2" />
+      </div>
+    </div>
+  );
+}
