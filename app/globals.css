@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #ff3374;
+  --color-brand-dark: #e61e5f;
+  --color-brand-soft: #ffe8ef;
+  --color-ink: #1f1f1f;
+  --color-muted: #9a9a9a;
+  --color-line: #e7e7e7;
+  --color-field: #f1f1f1;
+  --spacing-13: 3.25rem;
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+}
+
+:root {
+  --bg: #fafafa;
+  color-scheme: light;
+}
+
+html, body {
+  background: #ececec;
+  color: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.brand-gradient {
+  background: linear-gradient(120deg, #ff3374 0%, #ff7a7a 100%);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* 두 손잡이 나이 범위 슬라이더 (시안 11) */
+.range-dual { position: relative; height: 32px; }
+.range-dual input[type="range"] {
+  position: absolute; inset: 0; width: 100%; height: 32px; margin: 0;
+  background: transparent; pointer-events: none; -webkit-appearance: none; appearance: none;
+}
+.range-dual input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; pointer-events: auto;
+  width: 28px; height: 28px; border-radius: 9999px; background: var(--color-brand);
+  border: 3px solid #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); cursor: pointer;
+}
+.range-dual input[type="range"]::-moz-range-thumb {
+  pointer-events: auto; width: 24px; height: 24px; border-radius: 9999px; background: var(--color-brand);
+  border: 3px solid #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); cursor: pointer;
+}
+.range-dual input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
+.range-dual input[type="range"]:focus-visible { outline: none; }
+.range-dual input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 3px solid rgb(255 51 116 / 0.4); }
