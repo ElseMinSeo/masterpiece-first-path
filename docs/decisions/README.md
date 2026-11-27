@@ -7,4 +7,4 @@
 - [template.md](template.md)를 복사해서 씁니다.
 
 ## 목록
-아직 없음
+- [0001. 기술 스택](0001-tech-stack.md)

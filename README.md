@@ -1,32 +1,76 @@
-# 첫길 (masterpiece-first-path)
+# 첫, 길 (masterpiece-first-path)
 
-첫길 서비스를 개발하는 저장소입니다.
+운영자가 첫 만남을 소개하고, 두 사람이 시간과 장소를 고르면 예약까지 연결하는 서비스입니다.
+이 저장소는 **첫, 길 모바일 웹** 개발 전용입니다.
 
-> 첫길이 어떤 서비스인지는 [docs/overview.md](docs/overview.md)에 정리합니다.
+현재는 **MVP 단계 0~1 (로컬 데모)** 입니다. 외부 계정이나 API 키 없이 실행되고,
+모든 인물·장소·글은 개발용 가상 데이터입니다. 서비스 개요는 [docs/overview.md](docs/overview.md)에 있습니다.
+
+## 실행
+
+[Node.js](https://nodejs.org/) 20 이상이 필요합니다.
+
+```bash
+npm install
+npm run dev          # http://localhost:3000 을 브라우저(모바일 화면 크기)로 열기
+```
+
+| 명령 | 내용 |
+|---|---|
+| `npm run dev` | 개발 서버 (포트 3000) |
+| `npm run build` / `npm start` | 배포용 빌드 / 실행 |
+| `npm run typecheck` | TypeScript 타입 검사 |
+| `npm test` | Vitest 단위 테스트 (검증 규칙·저장소·필터) |
+| `npm run build && npm run test:e2e` | Playwright 화면 테스트 (포트 3100, 320/375/430px 포함) |
+
+## 스택
+
+Next.js 16 App Router · React 19 · TypeScript strict · Tailwind CSS 4 · Zod 4 · Vitest · Playwright
 
 ## 폴더 구조
 
-| 경로 | 무엇이 들어 있나 |
-| --- | --- |
-| `README.md` | 이 문서. 저장소 안내 |
-| `CLAUDE.md` | Claude가 작업할 때 따르는 규칙과 프로젝트 메모 |
-| `CHANGELOG.md` | 버전별로 무엇이 바뀌었는지 기록 |
-| `docs/` | 기획, 설계 문서 |
-| `docs/decisions/` | 중요한 결정과 그 이유 기록 |
-| `.github/` | 이슈와 PR을 쓸 때 쓰는 양식 |
+```
+app/                 화면 (home, places, places/[id], daily, saved, appointments, profile, apply/1·2·3·confirm·done)
+components/          재사용 UI: TopBar, BottomNav, Button, Card, TagChip, OptionCard, TextInput, StepIndicator,
+                     PlaceCard, BookmarkButton, ApplicationCard, AgeRange
+lib/apply/           신청서 선택지, Zod 검증(단계별·제출 전체), 날짜 도우미
+lib/data/            개발용 가상 장소·데일리 글 (출시 전 교체 대상)
+lib/repo/            데이터 접근 계약(AppRepository)과 localStorage 데모 구현
+lib/store.tsx        화면 전체가 공유하는 상태(저장 목록·초안·신청)
+tests/unit, tests/e2e
+docs/                서비스 개요, 시안 대비 차이, 결정 기록
+.github/             이슈·PR 양식
+CLAUDE.md, AGENTS.md AI 작업 규칙
+CHANGELOG.md         버전별 변경 기록
+```
 
-코드 폴더(예: `src/`)는 사용할 기술이 정해지면 추가합니다.
+### 데이터 계층 교체 방법 (단계 2)
+
+화면은 `getRepository()`가 돌려주는 `AppRepository`만 사용합니다. 단계 2에서 Supabase 구현을 추가하고
+`lib/repo/index.ts`에서 `NEXT_PUBLIC_DATA_SOURCE`에 따라 고르도록 바꾸면 됩니다. 제출 검증(`parseSubmission`)은
+서버 액션에서도 그대로 재사용할 수 있게 순수 함수로 분리했습니다.
+
+### 중복 제출 방지
+
+1. 버튼: 진행 중 플래그(ref)로 같은 틱의 연속 클릭을 차단
+2. 저장소: 초안마다 `idempotencyKey`를 두고, 같은 키의 동시 요청은 하나의 Promise로 합치며 이미 만든 신청을 돌려줌
+3. 저장소: 진행 중(`submitted/reviewing/offered`) 신청이 있으면 새 신청을 만들지 않음 (DB 단계에서 회차별 유일 제약으로 대체)
+
+### 브라우저 저장소
+
+`localStorage`의 `cheotgil.demo.v1.*` 키에 데모 데이터(닉네임·저장 목록·신청 초안·신청 내역)만 저장합니다.
+프로필 화면의 **데모 데이터 초기화**로 지울 수 있습니다.
 
 ## 작업 흐름
 
 1. **이슈 만들기:** 할 일이나 버그를 GitHub Issues에 적습니다. 양식이 준비되어 있습니다.
 2. **브랜치에서 작업:** main에 바로 고치지 않고, 작업용 브랜치를 만들어 거기서 고칩니다.
-3. **PR(Pull Request) 열기:** 브랜치의 변경 내용을 main에 합쳐 달라는 요청입니다. 무엇을 왜 바꿨는지 적습니다.
-4. **확인 후 머지:** 내용을 확인하고 main에 합칩니다.
+3. **PR 열기:** 브랜치의 변경 내용을 main에 합쳐 달라는 요청입니다. 무엇을 왜 바꿨는지 적습니다.
+4. **확인 후 머지:** 테스트가 통과하고 내용을 확인했으면 main에 합칩니다.
 
-## 용어
+### 용어
 
 - **main:** 항상 정상 상태를 유지하는 기본 브랜치
 - **브랜치:** main을 건드리지 않고 따로 작업하는 복사본
 - **커밋:** 변경 내용을 저장한 기록 한 단위
-- **PR:** 브랜치를 main에 합쳐 달라는 요청. 합치기 전에 변경 내용을 검토하는 곳
+- **PR (Pull Request):** 브랜치를 main에 합쳐 달라는 요청. 합치기 전에 변경 내용을 검토하는 곳
