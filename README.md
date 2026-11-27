@@ -1,4 +1,4 @@
-# 첫길 (masterpiece-firstpath)
+# 첫길 (masterpiece-first-path)
 
 첫길 서비스를 개발하는 저장소입니다.
 
